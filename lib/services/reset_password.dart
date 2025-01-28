@@ -34,7 +34,7 @@ Future<bool> SendEmail(String email) async {
 
 }
 Future<bool> SendCode(String email, String resetCode) async {
-  final Uri url = Uri.parse(ApiEndpoints.ResetPassword);
+  final Uri url = Uri.parse(ApiEndpoints.VerifResetPassword);
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},

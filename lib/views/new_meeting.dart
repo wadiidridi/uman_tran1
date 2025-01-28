@@ -1,0 +1,286 @@
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:dropdown_textfield/dropdown_textfield.dart';
+import '../models/meeting_model.dart';
+import '../models/user_model.dart';
+import '../services/meeting_service.dart';
+import 'audio_upload.dart';
+
+
+class CreateMeetingScreen extends StatefulWidget {
+  const CreateMeetingScreen({Key? key}) : super(key: key);
+
+  @override
+  _CreateMeetingScreenState createState() => _CreateMeetingScreenState();
+}
+
+class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _sujetController = TextEditingController();
+  final _heureController = TextEditingController();
+  final _dateController = TextEditingController();
+  final MeetingService _meetingService = MeetingService();
+
+  String? _userId;
+  int? _selectedParticipants; // Valeur sélectionnée pour le nombre de participants
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userId = prefs.getString('userId');
+    });
+  }
+  void _createMeeting() async {
+    if (_formKey.currentState!.validate()) {
+      if (_userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("User ID not found. Please log in again.")),
+        );
+        return;
+      }
+
+      if (_selectedParticipants == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select the number of participants.")),
+        );
+        return;
+      }
+
+      final meeting = Meeting(
+        id: "",
+        sujetReunion: _sujetController.text,
+        heure: _heureController.text,
+        nombreParticipants: _selectedParticipants!,
+        date: _dateController.text,
+        userId: _userId!,
+        audio: "",
+        transcriptionLocuteur: "",
+        resume: "",
+      );
+
+      try {
+        await _meetingService.createMeeting(meeting);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Meeting created successfully!")),
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AudioRecorderScreen(),
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to create meeting: $e")),
+        );
+      }
+    }
+  }
+
+  final List<String> _categories = [
+    "RH",
+    "Finance",
+    "Digital",
+    "Marketing",
+  ];
+
+  List<String> _selectedCategories = [];
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Create a New Meeting'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: _sujetController,
+                decoration: const InputDecoration(
+                  labelText: 'Meeting Title',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              // Champ de sélection de la date
+              TextFormField(
+                controller: _dateController,
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Date',
+                  border: OutlineInputBorder(),
+                  suffixIcon: Icon(Icons.calendar_today), // Icône de calendrier
+                ),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+
+                  if (pickedDate != null) {
+                    String formattedDate =
+                        "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+                    setState(() {
+                      _dateController.text = formattedDate;
+                    });
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a date';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height:20),
+              // Champ de sélection de l'heure avec une icône
+              TextFormField(
+                controller: _heureController,
+                readOnly: true, // Empêche la saisie manuelle
+                decoration: InputDecoration(
+                  labelText: 'Time',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: Icon(Icons.access_time), // Icône d'horloge
+                ),
+                onTap: () async {
+                  TimeOfDay? pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+
+                  if (pickedTime != null) {
+                    // Formate l'heure sélectionnée
+                    String formattedTime =
+                        "${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}";
+                    setState(() {
+                      _heureController.text = formattedTime;
+                    });
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a time';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+
+              // Liste déroulante pour le nombre de participants
+              DropdownButtonFormField<int>(
+
+                decoration: const InputDecoration(
+                  labelText: 'Number of Participants',
+                  border: OutlineInputBorder(),
+                ),
+                value: _selectedParticipants,
+
+                items: List.generate(
+                  5,
+                      (index) => DropdownMenuItem(
+                    value: index + 1,
+                    child: Text('${index + 1} Participants'),
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedParticipants = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please select the number of participants';
+                  }
+                  return null;
+                },
+              ),
+
+
+              const SizedBox(height: 20),
+              MultiSelectDialogField(
+                items: _categories
+                    .map((category) => MultiSelectItem<String>(category, category))
+                    .toList(),
+                title: const Text("Select Categories"),
+                selectedColor: Colors.black,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(
+                    color: Colors.grey,
+                  ),
+                ),
+                buttonText: const Text(
+                  "Categories",
+                  style: TextStyle(fontSize: 16),
+                ),
+                dialogHeight: 250, // Hauteur personnalisée du modal
+                onConfirm: (values) {
+                  setState(() {
+                    _selectedCategories = values.cast<String>();
+                  });
+                },
+                chipDisplay: MultiSelectChipDisplay(
+                  chipColor: Colors.grey[300],
+                  textStyle: const TextStyle(color: Colors.black),
+                  onTap: (value) {
+                    setState(() {
+                      _selectedCategories.remove(value);
+                    });
+                  },
+                ),
+                validator: (values) {
+                  if (values == null || values.isEmpty) {
+                    return 'Please select at least one category';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 40),
+
+              ElevatedButton(
+                onPressed: _createMeeting,
+
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 50),
+                  backgroundColor: Colors.black,
+                ),
+                child: Text(
+                  'Confirmer',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

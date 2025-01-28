@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'new_meeting.dart';
+
 
 class meetingList extends StatefulWidget {
   @override
@@ -64,20 +66,29 @@ class _meetingListState extends State<meetingList> {
                     ),
                   ),
                 ),
-                ElevatedButton.icon(
+                IconButton(
+                  icon: Icon(Icons.add, color: Colors.black,size:36),
                   onPressed: () {
-                    // Action pour uploader
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) =>  CreateMeetingScreen()),
+                    );
                   },
-                  icon: Icon(Icons.upload, color: Colors.white),
-                  label: Text('Upload'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
                 ),
+                // ElevatedButton.icon(
+                //   onPressed: () {
+                //     // Action pour uploader
+                //   },
+                //   icon: Icon(Icons.upload, color: Colors.white),
+                //   label: Text('Upload'),
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Colors.black,
+                //     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(8),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             SizedBox(height: 20),

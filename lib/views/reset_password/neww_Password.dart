@@ -4,6 +4,7 @@ import 'package:meeting/views/signup.dart';
 
 import '../../services/auth_service.dart';
 import '../../services/reset_password.dart';
+import '../login.dart';
 import '../meeting_List.dart';
 import 'add_code.dart';
 
@@ -92,7 +93,7 @@ class NewPassword extends StatelessWidget {
 
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) =>  meetingList()),
+                    MaterialPageRoute(builder: (context) =>  LoginPage()),
                   );
                 }  catch (e) {
                   _showErrorDialog(context, e.toString());
