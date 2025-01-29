@@ -9,7 +9,7 @@ class ApiEndpoints {
   // Meeting-related endpoints
   static const String summarize = "$baseUrl/auth/summarize";
   static const String createMeeting = "$baseUrl/meeting/meeting";
-  static const String getmmeting = "$baseUrl/auth/meetings";
+  static const String getmmeting = "$baseUrl/meeting/meetings";
   static const String deleteMeeting = "$baseUrl/auth/delete-meeting";
   static const String KeyApi = "$baseUrl/auth/add-api-key";
   static const String ResetPassword = "$baseUrl/auth/request-password-reset";
