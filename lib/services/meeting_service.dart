@@ -21,13 +21,13 @@ class MeetingService {
   Future<void> createMeeting(Meeting meeting) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
-
     if (userId == null) {
       print("User ID is null. Please log in again.");
       throw Exception("User ID not found in SharedPreferences.");
     }
 
     final Uri url = Uri.parse("${ApiEndpoints.createMeeting}/$userId");
+       print(url);
 
     try {
       final response = await http.post(
@@ -39,11 +39,6 @@ class MeetingService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
 
-        // Correction : accéder à '_id' à l'intérieur de 'meeting'
-        if (!data.containsKey('meeting') || data['meeting']['_id'] == null) {
-          print("Response does not contain '_id' or it is null: $data");
-          throw Exception("Missing '_id' in the API response.");
-        }
 
         final meetId = data['meeting']['_id'];
         await saveMeetData(meetId);  // Enregistrement du meetId sous 'meetId'

@@ -1,102 +1,146 @@
-import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
-class AudioRecorderScreen extends StatefulWidget {
-  const AudioRecorderScreen({super.key});
+import 'new_meeting.dart';
 
+
+class addRecord extends StatefulWidget {
   @override
-  _AudioRecorderScreenState createState() => _AudioRecorderScreenState();
+  _addRecordState createState() => _addRecordState();
+
 }
 
-class _AudioRecorderScreenState extends State<AudioRecorderScreen> {
 
+class _addRecordState extends State<addRecord> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Audio Recorder"),
-      ),
-
-      body: Column(
-        children: [
-          // Partie supérieure avec l'image en arrière-plan
-          Expanded(
-            flex: 1, // Prend la moitié de l'écran
-            child: Stack(
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.5, // 50% de la hauteur de l'écran
-                  child: Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/logo.png'),
-                        fit: BoxFit.contain, // Ajuste l'image
-                      ),
-                    ),
-                  ),
-                ),
-
-
-              ],
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'decifer',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          // Partie inférieure avec les boutons
-          Expanded(
-            flex: 1, // Prend l'autre moitié de l'écran
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Bouton "Enregistrer un nouvel audio"
-
-                  const SizedBox(width: 20), // Espace entre les boutons
-                  // Bouton "Importer un audio"
-
-                ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Action pour se déconnecter
+            },
+            child: Text(
+              'Sign out',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ],
       ),
-    );
-  }
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // Action pour enregistrer
+                  },
+                  icon: Icon(Icons.mic, color: Colors.white),
+                  label: Text('Record'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
 
-
-  void _showRecordingPopup() {
-    showModalBottomSheet(
-      context: context,
-      isDismissible: false,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          height: 300,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("Recording..."),
-              const SizedBox(height: 16),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // Action pour uploader
+                  },
+                  icon: Icon(Icons.upload, color: Colors.white),
+                  label: Text('Upload'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Transcriptions',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Expanded(
+              child: ListView(
                 children: [
-
-                  const SizedBox(width: 20),
-                  IconButton(
-                    icon: const Icon(Icons.stop),
-                    onPressed: () {
-
-                    },
-                    iconSize: 40,
+                  buildTranscriptionCard(
+                    title: 'Flutter Introduction',
+                    description:
+                    'Mobile users expect their apps to have beautiful designs, smooth animations and ...',
+                  ),
+                  buildTranscriptionCard(
+                    title: 'Functional Training',
+                    description:
+                    'Welcome to our functional training series. Breaking it down, functional training is ...',
                   ),
                 ],
               ),
-            ],
-          ),
-        );
-      },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
+  Widget buildTranscriptionCard({required String title, required String description}) {
+    return Card(
+      margin: EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: Colors.black26),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              description,
+              style: TextStyle(fontSize: 14, color: Colors.black54),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

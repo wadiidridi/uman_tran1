@@ -8,6 +8,8 @@ class Meeting {
   final String transcriptionLocuteur;  // Champ ajouté pour l'ID de l'utilisateur
   final String resume;
   final String? id;
+  final List<String> departements; // Ajout du champ départements
+
 
   Meeting({
     required this.sujetReunion,
@@ -18,7 +20,9 @@ class Meeting {
     required this.audio,
     required this.transcriptionLocuteur,
     required this.resume,
-    required this.id
+    required this.id,
+    required this.departements, // Ajouter ici
+
   });
 
   Map<String, dynamic> toJson() {
@@ -27,11 +31,15 @@ class Meeting {
       'heure': heure,
       'nombreParticipants': nombreParticipants,
       'date': date,
-      'userId': userId,  // Assurez-vous d'ajouter cet élément à la conversion JSON
+      'userId': userId,
+      'audio': audio,
+      'transcriptionLocuteur': transcriptionLocuteur,
+      'resume': resume,
       '_id': id,
-
+      'departement': departements, // Assurez-vous que c'est bien une liste
     };
   }
+
 
   factory Meeting.fromJson(Map<String, dynamic> json) {
     return Meeting(
@@ -44,7 +52,10 @@ class Meeting {
       transcriptionLocuteur: json['transcriptionLocuteur']?? '',
       resume: json['resume']?? '',
       id: json['_id'], // Assurez-vous que cela correspond au format de votre API
-
+      departements: (json['departements'] as List<dynamic>?)
+          ?.map((item) => item.toString())
+          .toList() ?? [], // Assurer que c'est bien une liste de Strings
     );
+
   }
 }

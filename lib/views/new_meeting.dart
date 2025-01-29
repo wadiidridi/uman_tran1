@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
@@ -7,8 +9,9 @@ import 'package:dropdown_textfield/dropdown_textfield.dart';
 import '../models/meeting_model.dart';
 import '../models/user_model.dart';
 import '../services/meeting_service.dart';
+import 'add_record.dart';
 import 'audio_upload.dart';
-
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class CreateMeetingScreen extends StatefulWidget {
   const CreateMeetingScreen({Key? key}) : super(key: key);
@@ -25,7 +28,8 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
   final MeetingService _meetingService = MeetingService();
 
   String? _userId;
-  int? _selectedParticipants; // Valeur sélectionnée pour le nombre de participants
+  int?
+      _selectedParticipants; // Valeur sélectionnée pour le nombre de participants
 
   @override
   void initState() {
@@ -39,64 +43,56 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
       _userId = prefs.getString('userId');
     });
   }
+
   void _createMeeting() async {
-    if (_formKey.currentState!.validate()) {
-      if (_userId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User ID not found. Please log in again.")),
-        );
-        return;
-      }
+    if (!_formKey.currentState!.validate()) return;
 
-      if (_selectedParticipants == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select the number of participants.")),
-        );
-        return;
-      }
+    if (_userId == null) {
+      _showErrorDialog(context, e.toString());
+      return;
+    }
 
-      final meeting = Meeting(
-        id: "",
-        sujetReunion: _sujetController.text,
-        heure: _heureController.text,
-        nombreParticipants: _selectedParticipants!,
-        date: _dateController.text,
-        userId: _userId!,
-        audio: "",
-        transcriptionLocuteur: "",
-        resume: "",
+    if (_selectedParticipants == null) {
+      _showErrorDialog(context, e.toString());
+      return;
+    }
+
+    if (_selectedDepartements.isEmpty) {
+      _showErrorDialog(context, e.toString());
+      return;
+    }
+
+    final meeting = Meeting(
+      id: "",
+      sujetReunion: _sujetController.text,
+      heure: _heureController.text,
+      nombreParticipants: _selectedParticipants!,
+      date: _dateController.text,
+      userId: _userId!,
+      audio: "",
+      transcriptionLocuteur: "",
+      resume: "",
+      departements: _selectedDepartements,
+    );
+
+    try {
+      await _meetingService.createMeeting(meeting);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Meeting created successfully!")),
       );
-
-      try {
-        await _meetingService.createMeeting(meeting);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Meeting created successfully!")),
-        );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AudioRecorderScreen(),
-          ),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to create meeting: $e")),
-        );
-      }
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => addRecord()),
+      );
+    } catch (e) {
+      _showErrorDialog(context, e.toString());
     }
   }
 
-  final List<String> _categories = [
-    "RH",
-    "Finance",
-    "Digital",
-    "Marketing",
-  ];
+  List<String> _selectedDepartements = [];
 
-  List<String> _selectedCategories = [];
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create a New Meeting'),
@@ -153,7 +149,7 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height:20),
+              const SizedBox(height: 20),
               // Champ de sélection de l'heure avec une icône
               TextFormField(
                 controller: _heureController,
@@ -189,16 +185,14 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
 
               // Liste déroulante pour le nombre de participants
               DropdownButtonFormField<int>(
-
                 decoration: const InputDecoration(
                   labelText: 'Number of Participants',
                   border: OutlineInputBorder(),
                 ),
                 value: _selectedParticipants,
-
                 items: List.generate(
                   5,
-                      (index) => DropdownMenuItem(
+                  (index) => DropdownMenuItem(
                     value: index + 1,
                     child: Text('${index + 1} Participants'),
                   ),
@@ -216,29 +210,25 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
                 },
               ),
 
-
               const SizedBox(height: 20),
+
               MultiSelectDialogField(
-                items: _categories
-                    .map((category) => MultiSelectItem<String>(category, category))
+                items: ["RH", "Finance", "Digital", "Marketing"]
+                    .map((category) =>
+                        MultiSelectItem<String>(category, category))
                     .toList(),
                 title: const Text("Select Categories"),
                 selectedColor: Colors.black,
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(5),
-                  border: Border.all(
-                    color: Colors.grey,
-                  ),
+                  border: Border.all(color: Colors.grey),
                 ),
-                buttonText: const Text(
-                  "Categories",
-                  style: TextStyle(fontSize: 16),
-                ),
-                dialogHeight: 250, // Hauteur personnalisée du modal
+                buttonText: const Text("Categories"),
+                dialogHeight: 250,
                 onConfirm: (values) {
                   setState(() {
-                    _selectedCategories = values.cast<String>();
+                    _selectedDepartements = values.cast<String>();
                   });
                 },
                 chipDisplay: MultiSelectChipDisplay(
@@ -246,7 +236,7 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
                   textStyle: const TextStyle(color: Colors.black),
                   onTap: (value) {
                     setState(() {
-                      _selectedCategories.remove(value);
+                      _selectedDepartements.remove(value);
                     });
                   },
                 ),
@@ -262,7 +252,6 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
 
               ElevatedButton(
                 onPressed: _createMeeting,
-
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 50),
                   backgroundColor: Colors.black,
@@ -275,12 +264,26 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
                   ),
                 ),
               ),
-
-
             ],
           ),
         ),
       ),
     );
   }
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Error"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
