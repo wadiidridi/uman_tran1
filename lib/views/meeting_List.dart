@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/meeting_model.dart';
 import '../services/meeting_service.dart';
+import '../widgets/custom_bottom_nav.dart';
 import 'new_meeting.dart';
 
 class MeetingList extends StatefulWidget {
@@ -62,23 +63,11 @@ class _MeetingListState extends State<MeetingList> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // Action pour enregistrer
-                  },
-                  icon: Icon(Icons.mic, color: Colors.white),
-                  label: Text('Record'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
+
                 IconButton(
                   icon: Icon(Icons.add, color: Colors.black, size: 36),
                   onPressed: () {
@@ -89,6 +78,18 @@ class _MeetingListState extends State<MeetingList> {
                   },
                 ),
               ],
+            ),
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Search',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey[200],
+              ),
             ),
             SizedBox(height: 20),
             Text(
@@ -125,8 +126,13 @@ class _MeetingListState extends State<MeetingList> {
                 },
               ),
             ),
+
           ],
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 0, // Onglet actif : History
+        context: context,
       ),
     );
   }

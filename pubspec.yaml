@@ -32,13 +32,25 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.1.0
   http: ^1.2.2
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   dropdown_textfield: ^1.2.0
   multi_select_flutter: ^4.1.3
-
+  lucide_icons: ^0.257.0
+  flutter_svg: ^2.0.16  # Ensure correct indentation here
+  fl_chart: ^0.69.2
+  flutter_sound: ^9.17.0
+  path_provider: ^2.1.5
+  pdf: ^3.11.1
+  dio: ^5.7.0
+  audioplayers: ^6.1.0
+  permission_handler: ^11.3.1
+  audio_waveforms: ^1.1.1
+  flutter_downloader: ^1.11.0
+  html: ^0.15.0
+  file_picker: ^8.1.4
+  docx_template: ^0.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -9,6 +9,7 @@ import 'package:dropdown_textfield/dropdown_textfield.dart';
 import '../models/meeting_model.dart';
 import '../models/user_model.dart';
 import '../services/meeting_service.dart';
+import '../widgets/custom_bottom_nav.dart';
 import 'add_record.dart';
 import 'audio_upload.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
@@ -267,6 +268,10 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 1, // Onglet actif : History
+        context: context,
       ),
     );
   }
