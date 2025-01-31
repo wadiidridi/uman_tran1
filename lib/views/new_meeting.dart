@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:meeting/views/playback.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
@@ -49,17 +51,17 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_userId == null) {
-      _showErrorDialog(context, e.toString());
+      _showErrorDialog(context, "User ID not found");
       return;
     }
 
     if (_selectedParticipants == null) {
-      _showErrorDialog(context, e.toString());
+      _showErrorDialog(context, "Please select the number of participants");
       return;
     }
 
     if (_selectedDepartements.isEmpty) {
-      _showErrorDialog(context, e.toString());
+      _showErrorDialog(context, "Please select at least one department");
       return;
     }
 
@@ -81,16 +83,33 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Meeting created successfully!")),
       );
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => addRecord()),
-      );
+
+      // 🔥 Afficher la popup
+      _showAudioOptionsDialog();
     } catch (e) {
       _showErrorDialog(context, e.toString());
     }
   }
-
   List<String> _selectedDepartements = [];
+  Future<void> _pickAudioFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
+    );
+
+    if (result != null && result.files.single.path != null) {
+      final selectedFilePath = result.files.single.path!;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PlaybackScreen(audioFilePath: selectedFilePath),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Aucun fichier sélectionné.")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -290,5 +309,30 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
       ),
     );
   }
+  void _showAudioOptionsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Meeting Created!"),
+        content: const Text("Would you like to record a new audio or upload an existing one?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddRecord()),
+              );
+            },
+            child: const Text("Record Audio"),
+          ),
+          TextButton(
+            onPressed: _pickAudioFile,
 
+            child: const Text("Upload Audio"),
+          ),
+        ],
+      ),
+    );
+  }
 }

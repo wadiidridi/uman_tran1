@@ -25,7 +25,7 @@ class CustomBottomNavBar extends StatelessWidget {
         nextScreen = CreateMeetingScreen();
         break;
       case 2:
-        nextScreen = addRecord();
+        nextScreen = AddRecord();
         break;
       default:
         return;
