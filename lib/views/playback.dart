@@ -165,7 +165,6 @@ class _PlaybackScreenState extends State<PlaybackScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
 
-
             ],
           ),
           const SizedBox(height: 20),

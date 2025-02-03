@@ -314,22 +314,39 @@ class _CreateMeetingScreenState extends State<CreateMeetingScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Meeting Created!"),
-        content: const Text("Would you like to record a new audio or upload an existing one?"),
+        content: const Text(
+          "Would you like to record a new audio or upload an existing one?",
+          style: TextStyle(fontSize: 18),
+        ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddRecord()),
-              );
-            },
-            child: const Text("Record Audio"),
-          ),
-          TextButton(
-            onPressed: _pickAudioFile,
-
-            child: const Text("Upload Audio"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.28, // Réduit un peu la largeur
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.upload, size: 18, color: Colors.white),
+                  onPressed: _pickAudioFile,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                  label: const Text('Upload', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.28,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.mic_none_rounded, size: 18, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AddRecord()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                  label: const Text('Record', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ],
           ),
         ],
       ),

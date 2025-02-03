@@ -19,7 +19,7 @@ class ApiEndpoints {
 
 
   // Autres endpoints
-  static const String transcription = "$baseUrl/auth/transcribe";
+  static const String transcription = "$baseUrl/meeting/transcribe";
   static const String transcribeidentif = "$baseUrl/auth/transcribeidentif";
 
 
