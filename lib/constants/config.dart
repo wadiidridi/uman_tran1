@@ -7,7 +7,7 @@ class ApiEndpoints {
   static const String signIn = "$baseUrl/auth/login";
 
   // Meeting-related endpoints
-  static const String summarize = "$baseUrl/auth/summarize";
+  static const String summarize = "$baseUrl/meeting/summarize";
   static const String createMeeting = "$baseUrl/meeting/meeting";
   static const String getmmeting = "$baseUrl/meeting/meetings";
   static const String deleteMeeting = "$baseUrl/auth/delete-meeting";
@@ -20,7 +20,7 @@ class ApiEndpoints {
 
   // Autres endpoints
   static const String transcription = "$baseUrl/meeting/transcribe";
-  static const String transcribeidentif = "$baseUrl/auth/transcribeidentif";
+  static const String transcribeidentif = "$baseUrl/meeting/transcribeidentif";
 
 
 }

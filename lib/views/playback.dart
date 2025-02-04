@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:meeting/views/transcription.dart';
 import '../models/AudioFile.dart';
 import '../services/audio_service.dart';
 
@@ -73,7 +74,12 @@ class _PlaybackScreenState extends State<PlaybackScreen> {
     if (await File(audioFile.filePath).exists()) {
       try {
         final transcription = await _audioService.uploadAudio(audioFile);
-
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TranscriptionScreen(transcription: transcription),
+          ),
+        );
 
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -164,7 +170,24 @@ class _PlaybackScreenState extends State<PlaybackScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              ElevatedButton(
+                child: Text('Transcription avec identification  peut-être plus lente',style: TextStyle(color: Colors.white),),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  fixedSize: Size(140, 34), // specify width, height
 
+                ),
+                onPressed: _uploadAudioIdent,
+              ),
+              ElevatedButton(
+                child: Text('Transcription Rapide sans identification',style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size(140, 34), // specify width, height
+
+                  backgroundColor: Colors.black,
+                ),
+                onPressed: _uploadAudio,
+              ),
             ],
           ),
           const SizedBox(height: 20),

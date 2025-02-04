@@ -47,6 +47,8 @@ class AudioService {
 
       if (response.statusCode == 200) {
         print("Audio uploaded successfully!");
+        print("Response body: $responseBody");
+
         // Vérification du contenu de la réponse
         if (responseBody.trim().startsWith('{') &&
             responseBody.trim().endsWith('}')) {
@@ -100,11 +102,9 @@ class AudioService {
         "Content-Type": "multipart/form-data",
       });
 
-      // Ajouter le fichier audio
       request.files.add(await http.MultipartFile.fromPath(
-        'audio', // Nom du champ attendu par le backend
+        'audio',
         audioFile.filePath,
-        contentType: MediaType('audio', 'aac'), // Type MIME approprié
       ));
 
       print("Request URL: $url");
@@ -120,6 +120,8 @@ class AudioService {
 
       // Vérifier la réponse
       if (response.statusCode == 200) {
+        print("Audio uploaded successfully!");
+        print("Response body: $responseBody");
         final responseData = jsonDecode(responseBody);
         return responseData['transcriptionLocuteur'] ??
             "Aucune transcription disponible.";
